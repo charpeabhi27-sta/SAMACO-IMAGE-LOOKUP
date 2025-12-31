@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SAMACO – Image Lookup Console</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0b1633;
+            color: #0f172a;
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top navigation bar */
+        .topbar {
+            height: 64px;
+            background: linear-gradient(90deg, #10224e, #1f3c88);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            color: #e5e9f5;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo {
+            height: 42px;
+        }
+
+        .product-name {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            opacity: 0.85;
+        }
+
+        .topbar-title {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .topbar-right {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* Main content area */
+        .content {
+            flex: 1;
+            padding: 26px 32px 32px;
+            background: radial-gradient(circle at top left, #1a2a55, #050816);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .layout {
+            width: 100%;
+            max-width: 1120px;
+            display: grid;
+            grid-template-columns: 1.1fr 1.1fr;
+            gap: 22px;
+        }
+
+        .panel {
+            background: rgba(248, 250, 253, 0.98);
+            border-radius: 16px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.40);
+            padding: 20px 22px 18px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 12px;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .panel-subtitle {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        /* Search panel content */
+        .search-row {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 8px;
+        }
+
+        .search-row label {
+            font-size: 12px;
+            color: #4b5563;
+            margin-right: 10px;
+            min-width: 90px;
+        }
+
+        .search-input-container {
+            flex: 1;
+            display: flex;
+        }
+
+        .search-input-container input {
+            flex: 1;
+            padding: 10px 12px;
+            font-size: 14px;
+            border-radius: 10px 0 0 10px;
+            border: 1px solid #d1d5db;
+            outline: none;
+        }
+
+        .search-input-container input:focus {
+            border-color: #1f3c88;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.20);
+        }
+
+        .search-input-container button {
+            padding: 10px 16px;
+            font-size: 14px;
+            border-radius: 0 10px 10px 0;
+            border: none;
+            background: #1f3c88;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .search-input-container button:hover {
+            background: #162b63;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+            margin-bottom: 12px;
+        }
+
+        .hint {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        #message {
+            font-size: 12px;
+            min-height: 18px;
+        }
+
+        #message.error {
+            color: #b91c1c;
+        }
+
+        #message.ok {
+            color: #15803d;
+        }
+
+        .chips-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #9ca3af;
+            margin-top: 6px;
+            margin-bottom: 4px;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .chip {
+            padding: 4px 11px;
+            border-radius: 999px;
+            border: 1px solid #d1d5db;
+            background: #f3f4f6;
+            font-size: 11px;
+            color: #374151;
+            cursor: pointer;
+        }
+
+        .chip:hover {
+            border-color: #1f3c88;
+            color: #1f3c88;
+            background: #e5e7eb;
+        }
+
+        /* Image panel */
+        .preview-area {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .image-shell {
+            flex: 1;
+            border-radius: 14px;
+            border: 1px dashed #d1d5db;
+            background: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            text-align: center;
+        }
+
+        #resultImage {
+            max-width: 100%;
+            max-height: 280px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            display: none;
+        }
+
+        .empty-message {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .meta-bar {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .meta-label {
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #9ca3af;
+        }
+
+        .meta-value {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .topbar {
+                padding: 0 16px;
+            }
+            .content {
+                padding: 18px 16px 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="page">
+    <!-- TOP BAR -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <!-- Use your PNG logo file name exactly -->
+            <img src="SAMACOLOGO.png" alt="SAMACO Toys & Leisure" class="logo">
+            <div>
+                <div class="product-name">SAMACO TOYS & LEISURE</div>
+                <div class="topbar-title">Image Lookup Console</div>
+            </div>
+        </div>
+        <div class="topbar-right">
+            Internal use &middot; Item image verification
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="content">
+        <section class="layout">
+            <!-- SEARCH PANEL -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Search by item code</div>
+                        <div class="panel-subtitle">
+                            Enter an INT code to quickly view the corresponding product image.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search-row">
+                    <label for="searchBox">Item code</label>
+                    <div class="search-input-container">
+                        <input id="searchBox" type="text"
+                               placeholder="Example: INT4321">
+                        <button id="searchButton">Search</button>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="hint">
+                        Press Enter after typing the code. Codes are not case-sensitive.
+                    </div>
+                </div>
+
+                <div id="message"></div>
+
+                <div class="chips-title">Quick test codes</div>
+                <div class="chips" id="chipContainer">
+                    <button class="chip" data-code="INT4321">INT4321</button>
+                    <button class="chip" data-code="INT1230">INT1230</button>
+                    <button class="chip" data-code="INT1234">INT1234</button>
+                    <button class="chip" data-code="INT5789">INT5789</button>
+                    <button class="chip" data-code="INT5678">INT5678</button>
+                    <button class="chip" data-code="INT8765">INT8765</button>
+                </div>
+            </div>
+
+            <!-- IMAGE PREVIEW PANEL -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Image preview</div>
+                        <div class="panel-subtitle">
+                            Confirm item visuals before reporting or sharing with SACO.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-area">
+                    <div class="image-shell">
+                        <img id="resultImage" src="" alt="Result image">
+                        <div id="emptyState" class="empty-message">
+                            No image loaded. Search an item code on the left to see the image here.
+                        </div>
+                    </div>
+
+                    <div class="meta-bar">
+                        <div>
+                            <div class="meta-label">Current code</div>
+                            <div class="meta-value" id="currentCode">None</div>
+                        </div>
+                        <div>
+                            <div class="meta-label">Status</div>
+                            <div class="meta-value" id="statusText">Waiting for search</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    // Map item codes to image filenames
+    const images = {
+        "int4321": "INT4321.png",
+        "int1230": "INT1230.png",
+        "int1234": "INT1234.png",
+        "int5789": "INT5789.png",
+        "int5678": "INT5678.png",
+        "int8765": "INT8765.png"
+    };
+
+    const searchBox = document.getElementById("searchBox");
+    const searchButton = document.getElementById("searchButton");
+    const chipContainer = document.getElementById("chipContainer");
+    const resultImage = document.getElementById("resultImage");
+    const emptyState = document.getElementById("emptyState");
+    const message = document.getElementById("message");
+    const currentCode = document.getElementById("currentCode");
+    const statusText = document.getElementById("statusText");
+
+    function doSearch(fromChipCode) {
+        const raw = fromChipCode || searchBox.value;
+        const input = raw.trim().toLowerCase();
+
+        if (input === "") {
+            message.textContent = "Please enter an item code.";
+            message.className = "error";
+            resultImage.style.display = "none";
+            emptyState.style.display = "block";
+            currentCode.textContent = "None";
+            statusText.textContent = "No input";
+            return;
+        }
+
+        if (images[input]) {
+            resultImage.src = images[input];
+            resultImage.style.display = "block";
+            emptyState.style.display = "none";
+            message.textContent = "Image loaded for " + raw.toUpperCase() + ".";
+            message.className = "ok";
+            currentCode.textContent = raw.toUpperCase();
+            statusText.textContent = "Image found";
+        } else {
+            resultImage.style.display = "none";
+            emptyState.style.display = "block";
+            message.textContent = "No image found for " + raw.toUpperCase() + ".";
+            message.className = "error";
+            currentCode.textContent = raw.toUpperCase();
+            statusText.textContent = "Image missing";
+        }
+    }
+
+    searchButton.addEventListener("click", () => doSearch());
+
+    searchBox.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+            doSearch();
+        }
+    });
+
+    chipContainer.addEventListener("click", (e) => {
+        if (e.target.classList.contains("chip")) {
+            const code = e.target.getAttribute("data-code");
+            searchBox.value = code;
+            doSearch(code);
+        }
+    });
+</script>
+</body>
+</html>
